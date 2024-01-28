@@ -13,7 +13,7 @@ public class Move : MonoBehaviour
     private bool isSpeedingUp = false;
     private float speedupTimer;
     private int speedUpCount = 0;
-    public TMP_Text speedUpCountText; // Sử dụng TMP_Text thay vì Text
+    public TMP_Text speedUpCountText; 
 
     void Start()
     {
@@ -107,7 +107,7 @@ public class Move : MonoBehaviour
 
     void UpdateSpeedUpCountText()
     {
-        // Cập nhật nội dung của TextMeshPro
+      
         speedUpCountText.text = "Count: " + speedUpCount.ToString();
     }
 }
