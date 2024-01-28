@@ -1,64 +1,77 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Move : MonoBehaviour
 {
-    public float moveSpeed = 5f; // Tốc độ di chuyển
-    public float rotationSpeed = 100f; // Tốc độ xoay
+    public float moveSpeed = 5f;
+    public float rotationSpeed = 100f;
+    public float speedupMultiplier = 2f;
+    public float speedupDuration = 2f;
     private Rigidbody2D rb;
+    private bool isSpeedingUp = false;
+    private float speedupTimer;
+    private int speedUpCount = 0;
+    public TMP_Text speedUpCountText; // Sử dụng TMP_Text thay vì Text
 
-    // Start is called before the first frame update
     void Start()
     {
-        // Lấy thành phần Rigidbody2D của đối tượng
         rb = GetComponent<Rigidbody2D>();
         if (rb == null)
         {
             Debug.LogError("Rigidbody2D is missing on the game object.");
         }
+
+        if (speedUpCountText == null)
+        {
+            Debug.LogError("TextMeshPro Text is not assigned for displaying SpeedUp count.");
+        }
+        else
+        {
+            UpdateSpeedUpCountText();
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // Lấy input từ bàn phím
+        if (isSpeedingUp)
+        {
+            speedupTimer -= Time.deltaTime;
+
+            if (speedupTimer <= 0f)
+            {
+                ResetSpeed();
+            }
+        }
+
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        // Tính toán hướng di chuyển
         Vector2 moveDirection = new Vector2(horizontalInput, verticalInput).normalized;
 
-        // Di chuyển và xoay đối tượng
         MoveObject(moveDirection);
 
     }
+
     void MoveObject(Vector2 moveDirection)
     {
-        // Kiểm tra xem có tồn tại Rigidbody2D hay không
         if (rb != null)
         {
-            // Tính toán vector di chuyển
             Vector2 movement = moveDirection * moveSpeed * Time.deltaTime;
 
-            // Áp dụng di chuyển vào velocity của đối tượng theo hướng đầu mũi
             rb.velocity = transform.up * movement.y;
 
-            // Nếu nhấn nút D, thực hiện xoay về phải
             if (Input.GetKey(KeyCode.D))
             {
-                // Áp dụng lực xoay về phải
                 rb.angularVelocity = -rotationSpeed;
             }
-            // Nếu nhấn nút A, thực hiện xoay về trái
             else if (Input.GetKey(KeyCode.A))
             {
-                // Áp dụng lực xoay về trái
                 rb.angularVelocity = rotationSpeed;
             }
             else
             {
-                // Ngưng lực xoay khi không nhấn nút
                 rb.angularVelocity = 0f;
             }
         }
@@ -66,5 +79,35 @@ public class Move : MonoBehaviour
         {
             Debug.LogError("Rigidbody2D is missing on the game object.");
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("SpeedUp"))
+        {
+            StartSpeedUp();
+            other.gameObject.SetActive(false);
+            speedUpCount++;
+            UpdateSpeedUpCountText();
+        }
+    }
+
+    void StartSpeedUp()
+    {
+        isSpeedingUp = true;
+        speedupTimer = speedupDuration;
+        moveSpeed *= speedupMultiplier;
+    }
+
+    void ResetSpeed()
+    {
+        isSpeedingUp = false;
+        moveSpeed /= speedupMultiplier;
+    }
+
+    void UpdateSpeedUpCountText()
+    {
+        // Cập nhật nội dung của TextMeshPro
+        speedUpCountText.text = "Count: " + speedUpCount.ToString();
     }
 }
