@@ -90,7 +90,18 @@ public class Move : MonoBehaviour
             speedUpCount++;
             UpdateSpeedUpCountText();
         }
+        else if (other.CompareTag("Customer"))
+        {
+            // Kiểm tra nếu speedUpCount > 0 thì mới trừ
+            if (speedUpCount > 0)
+            {
+                speedUpCount--;
+                UpdateSpeedUpCountText();
+            }
+        }
     }
+
+
 
     void StartSpeedUp()
     {
