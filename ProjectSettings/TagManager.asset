@@ -7,6 +7,8 @@ TagManager:
   - Package
   - Customer
   - SpeedUp
+  - Ground
+  - Obstacle
   layers:
   - Default
   - TransparentFX

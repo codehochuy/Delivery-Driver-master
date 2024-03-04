@@ -13,7 +13,10 @@ public class Move : MonoBehaviour
     private bool isSpeedingUp = false;
     private float speedupTimer;
     private int speedUpCount = 0;
-    public TMP_Text speedUpCountText; 
+    public TMP_Text speedUpCountText;
+
+    public AudioSource carAudio; // Tham chiếu đến thành phần Audio Source của xe ô tô
+    private bool hasPlayedSound = false; // Biến để kiểm tra xem âm thanh đã được phát chưa
 
     void Start()
     {
@@ -35,6 +38,10 @@ public class Move : MonoBehaviour
 
     void Update()
     {
+        if (MainMenuController.instance.star == false)
+        {
+            return;
+        }
         if (isSpeedingUp)
         {
             speedupTimer -= Time.deltaTime;
@@ -52,6 +59,21 @@ public class Move : MonoBehaviour
 
         MoveObject(moveDirection);
 
+        if (rb.velocity.magnitude > 0)
+        {
+            // Kiểm tra nếu âm thanh chưa được phát, bắt đầu phát
+            if (!hasPlayedSound)
+            {
+                carAudio.Play();
+                hasPlayedSound = true; // Đánh dấu rằng âm thanh đã được phát
+            }
+        }
+        else
+        {
+            // Ngừng phát âm thanh khi không còn di chuyển
+            carAudio.Stop();
+            hasPlayedSound = false; // Đặt lại cờ để cho phép phát lại âm thanh khi di chuyển tiếp
+        }
     }
 
     void MoveObject(Vector2 moveDirection)
@@ -61,6 +83,7 @@ public class Move : MonoBehaviour
             Vector2 movement = moveDirection * moveSpeed * Time.deltaTime;
 
             rb.velocity = transform.up * movement.y;
+/*            carAudio.Play();*/
 
             if (Input.GetKey(KeyCode.D))
             {
@@ -101,8 +124,6 @@ public class Move : MonoBehaviour
         }
     }
 
-
-
     void StartSpeedUp()
     {
         isSpeedingUp = true;
@@ -118,7 +139,6 @@ public class Move : MonoBehaviour
 
     void UpdateSpeedUpCountText()
     {
-      
         speedUpCountText.text = "Count: " + speedUpCount.ToString();
     }
 }
