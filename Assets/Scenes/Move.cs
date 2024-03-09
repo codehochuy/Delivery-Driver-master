@@ -18,8 +18,13 @@ public class Move : MonoBehaviour
     public AudioSource carAudio; // Tham chiếu đến thành phần Audio Source của xe ô tô
     private bool hasPlayedSound = false; // Biến để kiểm tra xem âm thanh đã được phát chưa
 
+    public GameObject pausepanel;
+    public GameObject PlayAgainepanel;
+
     void Start()
     {
+        pausepanel.SetActive(false);   
+        PlayAgainepanel.SetActive(false);
         rb = GetComponent<Rigidbody2D>();
         if (rb == null)
         {
@@ -38,6 +43,12 @@ public class Move : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            pausepanel.SetActive(true);
+            Time.timeScale = 0.0f;
+
+        }
         if (MainMenuController.instance.star == false)
         {
             return;
@@ -50,6 +61,22 @@ public class Move : MonoBehaviour
             {
                 ResetSpeed();
             }
+        }
+        GameObject[] speedUpObjects = GameObject.FindGameObjectsWithTag("SpeedUp");
+        bool allSpeedUpDeactivated = true;
+        foreach (GameObject obj in speedUpObjects)
+        {
+            if (obj.activeSelf)
+            {
+                allSpeedUpDeactivated = false;
+                break;
+            }
+        }
+        // Kiểm tra nếu tất cả các đối tượng "SpeedUp" đã bị deactive và speedUpCount = 0 thì thực hiện hành động của bạn
+        if (allSpeedUpDeactivated && speedUpCount == 0)
+        {
+            PlayAgainepanel.SetActive(true);
+            Debug.Log("All SpeedUp objects are deactivated and speedUpCount is 0.");
         }
 
         float horizontalInput = Input.GetAxis("Horizontal");
